@@ -20,5 +20,7 @@ module.exports = {
     project: './tsconfig.json'
   },
   plugins: ['react', 'prettier'],
-  rules: {}
+  rules: {
+    'max-len': ['error', { code: 80 }]
+  }
 }
