@@ -18,7 +18,7 @@ export const Bar = ({ height, target, color }: BarProps): JSX.Element => {
       }}
       style={{
         height: `${height / 256 * 100}%`,
-        backgroundColor: target ? 'red' : color
+        backgroundColor: target ? 'hsl(300, 100%, 50%)' : color
       }}
     />
   )
@@ -37,7 +37,8 @@ export const SortGraph = ({ record }: SortGraphProps): JSX.Element => {
       display: 'flex',
       justifyContent: 'start',
       mx: '5px',
-      alignItems: 'end'
+      alignItems: 'end',
+      height: '100%'
     }}
     >
       {/* <p>{JSON.stringify(record)}</p> */}
@@ -47,7 +48,7 @@ export const SortGraph = ({ record }: SortGraphProps): JSX.Element => {
             key={index}
             height={value}
             target={record?.manuPoint.includes(index)}
-            color='blue'
+            color={`hsl(${value / 256 * 270}, 90%, 40%)`}
           />
         )
       })}
