@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { quickSort } from './logic/quickSort'
 import { selectionSort } from './logic/selectionSort'
+import { insertSort } from './logic/insertSort'
 import { createShuffleArray, createUpArray } from './logic/createArray'
 import { Record } from './types/record'
 import { Box } from '@mui/material'
@@ -28,8 +29,8 @@ const useAnimationFrame = (isRunning: boolean,
   const loop: FrameRequestCallback = useCallback((now) => {
     if (isRunning) {
       // isRunning が true の時だけループ
-      reqIdRef.current = requestAnimationFrame(loop)
       callback(now, elapsedRef.current)
+      reqIdRef.current = requestAnimationFrame(loop)
     }
     // isRunning も依存配列に追加
   }, [isRunning, callback])
@@ -41,16 +42,16 @@ const useAnimationFrame = (isRunning: boolean,
 }
 
 const App = (): JSX.Element => {
-  // const [count, setCount] = useState(0)
   const [quickRecord, setQuickRecord] = useState<Record[]>([])
-  const [selectionRecord, setSelectionRecord] = useState<Record[]>([])
+  const [n2Record, setN2Record] = useState<Record[]>([])
   const [counter, setCounter] = useState(0)
   const [speed, setSpeed] = useState(1)
   const [arrayType, setArrayType] =
     useState<'up' | 'down' | 'shuffle'>('shuffle')
+  const [n2SortType, setN2SortType] = useState<'selection' | 'insert'>('insert')
 
   const isRecordsGenerated = quickRecord[0]?.array?.length > 0 &&
-    selectionRecord[0]?.array?.length > 0
+    n2Record[0]?.array?.length > 0
 
   const createSortRecord = (): void => {
     setCounter(0)
@@ -68,8 +69,10 @@ const App = (): JSX.Element => {
     setQuickRecord(record)
     console.log(record)
 
-    const record2 = selectionSort(array2)
-    setSelectionRecord(record2)
+    // const record2 = selectionSort(array2)
+    const record2 =
+      (n2SortType === 'insert') ? insertSort(array2) : selectionSort(array2)
+    setN2Record(record2)
     console.log(record2)
   }
 
@@ -87,8 +90,8 @@ const App = (): JSX.Element => {
   }, [isRunning, speed])
 
   useAnimationFrame(isRunning, useCallback((now, _) => {
-    if (counterRef.current >= quickRecord.length - 1 &&
-      counterRef.current >= selectionRecord.length - 1) {
+    if (counterRef.current >= quickRecord.length &&
+      counterRef.current >= n2Record.length) {
       setIsRunning(false)
       return
     }
@@ -98,9 +101,12 @@ const App = (): JSX.Element => {
       nextCounter = 0
       initialCounterRef.current = 0
     }
+    if (nextCounter > n2Record.length) {
+      nextCounter = n2Record.length
+    }
     setCounter(nextCounter)
   }
-  , [speed, quickRecord, selectionRecord]))
+  , [speed, quickRecord, n2Record]))
 
   const handleBlur = (): void => {
     if (speed < 1) {
@@ -110,7 +116,6 @@ const App = (): JSX.Element => {
     }
   }
 
-  // console.log(quickRecord.length, selectionRecord.length)
   return (
     <div style={{ height: '100%', display: 'flex', flexFlow: 'column' }}>
       <AppBar position='static'>
@@ -135,6 +140,9 @@ const App = (): JSX.Element => {
               variant='h6' component='div' sx={{ textAlign: 'center' }}
             >
               クイックソート
+              {counter >= quickRecord.length && isRecordsGenerated
+                ? ` 完了(${quickRecord.length})`
+                : ''}
             </Typography>
             <SortGraph record={(counter >= quickRecord.length)
               ? { ...quickRecord[quickRecord.length - 1], manuPoint: [] }
@@ -152,32 +160,52 @@ const App = (): JSX.Element => {
             <Typography
               variant='h6' component='div' sx={{ textAlign: 'center' }}
             >
-              選択ソート
+              {n2SortType === 'insert' ? '挿入法' : '選択ソート'}
+              {counter >= n2Record.length && isRecordsGenerated
+                ? ` 完了(${n2Record.length})`
+                : ''}
             </Typography>
-            <SortGraph record={(counter >= selectionRecord.length)
+            <SortGraph record={(counter >= n2Record.length)
               ? {
-                  ...selectionRecord[selectionRecord.length - 1],
+                  ...n2Record[n2Record.length - 1],
                   manuPoint: []
                 }
-              : selectionRecord[counter]}
+              : n2Record[counter]}
             />
           </Box>
         </Box>
         <Box sx={{ width: '200px', borderLeft: 1, p: '1rem' }}>
-          <FormControl fullWidth>
-            <InputLabel id='demo-simple-select-label'>Age</InputLabel>
+          <FormControl fullWidth sx={{ my: '0.4rem' }}>
+            <InputLabel id='demo-simple-select-label'>数列生成方式</InputLabel>
             <Select
               labelId='demo-simple-select-label'
               id='demo-simple-select'
               value={arrayType}
               label='Age'
               onChange={(e) => {
+                setQuickRecord([])
+                setN2Record([])
                 setArrayType(e.target.value as 'up' | 'down' | 'shuffle')
               }}
             >
               <MenuItem value='up'>昇順</MenuItem>
               <MenuItem value='down'>降順</MenuItem>
               <MenuItem value='shuffle'>ランダム</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl fullWidth sx={{ my: '0.4rem' }}>
+            <InputLabel id='sortMethodLabel'>O(n<sup>2</sup>) ソート方式</InputLabel>
+            <Select
+              labelId='sortMethodLabel'
+              value={n2SortType}
+              onChange={(e) => {
+                setQuickRecord([])
+                setN2Record([])
+                setN2SortType(e.target.value as 'selection' | 'insert')
+              }}
+            >
+              <MenuItem value='selection'>選択法</MenuItem>
+              <MenuItem value='insert'>挿入法</MenuItem>
             </Select>
           </FormControl>
           <Button
@@ -188,24 +216,32 @@ const App = (): JSX.Element => {
           </Button>
           <hr />
           <Typography variant='subtitle1' component='div'>ステップ</Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Box
+            sx={{
+              display: 'flex', justifyContent: 'space-between', gap: '0.5rem'
+            }}
+          >
             <Button
               onClick={() => { setCounter(counter - 1) }}
               variant='outlined'
               disabled={!isRecordsGenerated || counter <= 0 || isRunning}
+              size='small'
+              sx={{ flexGrow: 1, minWidth: 'auto' }}
             >
-              -1
+              -
             </Button>
             <p>{counter}</p>
             <Button
               onClick={() => { setCounter(counter + 1) }}
               variant='outlined'
               disabled={!isRecordsGenerated || (
-                counter >= quickRecord.length - 1 &&
-                counter >= selectionRecord.length - 1) ||
+                counter >= quickRecord.length &&
+                counter >= n2Record.length) ||
                 isRunning}
+              size='small'
+              sx={{ flexGrow: 1, minWidth: 'auto' }}
             >
-              +1
+              +
             </Button>
           </Box>
           <Button
