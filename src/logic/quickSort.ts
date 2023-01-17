@@ -5,9 +5,7 @@ export function quickSort (array: number[]): Record[] {
   const result: Record[] = []
   result.push({ array: [...array], manuPoint: [] })
   function quickSortInner (array: number[], start: number, end: number): void {
-    if (start >= end) {
-      return
-    }
+    if (start >= end) return
     let i = start
     let j = end
     const pivot = array[Math.floor((end + start) / 2)]

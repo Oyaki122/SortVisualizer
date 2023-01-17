@@ -24,7 +24,6 @@ interface SortGraphProps {
 }
 
 export const SortGraph = ({ record }: SortGraphProps): JSX.Element => {
-  // console.log(record)
   return (
     <div style={{
       width: '100%',

@@ -29,11 +29,9 @@ const useAnimationFrame = (isRunning: boolean,
 
   const loop: FrameRequestCallback = useCallback((now) => {
     if (isRunning) {
-      // isRunning が true の時だけループ
       callback(now, elapsedRef.current)
       reqIdRef.current = requestAnimationFrame(loop)
     }
-    // isRunning も依存配列に追加
   }, [isRunning, callback])
 
   useEffect(() => {
