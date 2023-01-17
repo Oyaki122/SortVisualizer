@@ -9,7 +9,7 @@ function shuffle (array: number[]): number[] {
 
 export function createShuffleArray (): number[] {
   const array = []
-  for (let i = 1; i <= 256; i++) {
+  for (let i = 1; i <= 512; i++) {
     array.push(i)
   }
   return shuffle(array)
@@ -17,15 +17,7 @@ export function createShuffleArray (): number[] {
 
 export function createUpArray (): number[] {
   const array = []
-  for (let i = 1; i <= 256; i++) {
-    array.push(i)
-  }
-  return array
-}
-
-export function createDownArray (num: number): number[] {
-  const array = []
-  for (let i = num; i > 0; i--) {
+  for (let i = 1; i <= 512; i++) {
     array.push(i)
   }
   return array

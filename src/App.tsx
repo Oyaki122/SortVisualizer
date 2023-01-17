@@ -4,7 +4,9 @@ import { selectionSort } from './logic/selectionSort'
 import { insertSort } from './logic/insertSort'
 import { createShuffleArray, createUpArray } from './logic/createArray'
 import { Record } from './types/record'
-import { Box } from '@mui/material'
+import { SortGraph } from './component/SortGraph'
+
+import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import AppBar from '@mui/material/AppBar'
 import Typography from '@mui/material/Typography'
@@ -16,7 +18,6 @@ import FormControl from '@mui/material/FormControl'
 import InputLabel from '@mui/material/InputLabel'
 import Select from '@mui/material/Select'
 import MenuItem from '@mui/material/MenuItem'
-import { SortGraph } from './component/SortGraph'
 
 const useAnimationFrame = (isRunning: boolean,
   callback: (now: number, prev: number) => void): void => {
@@ -69,7 +70,6 @@ const App = (): JSX.Element => {
     setQuickRecord(record)
     console.log(record)
 
-    // const record2 = selectionSort(array2)
     const record2 =
       (n2SortType === 'insert') ? insertSort(array2) : selectionSort(array2)
     setN2Record(record2)
@@ -111,8 +111,8 @@ const App = (): JSX.Element => {
   const handleBlur = (): void => {
     if (speed < 1) {
       setSpeed(1)
-    } else if (speed > 5000) {
-      setSpeed(5000)
+    } else if (speed > 2000) {
+      setSpeed(2000)
     }
   }
 
